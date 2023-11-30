@@ -8,7 +8,7 @@ services:
       - testnet
       - generate-genesis
       - --fork=capella
-      - --num-validators=64
+      - --num-validators=1
       - --genesis-time-delay=15
       - --output-ssz=/consensus/genesis.ssz
       - --chain-config-file=/consensus/config.yml
@@ -28,6 +28,14 @@ services:
     depends_on:
       create-beacon-chain-genesis:
         condition: service_completed_successfully
+
+  logproxy:
+    build: ./logproxy
+    depends_on:
+      geth:
+        condition: service_started
+    ports:
+      - 9551:9551
 
   # Runs a Prysm beacon chain from a specified genesis state created in the previous step
   # and connects to go-ethereum in the same network as the execution client.
@@ -49,7 +57,7 @@ services:
       - --chain-id=${CHAIN_ID:-32382}
       - --rpc-host=0.0.0.0
       - --grpc-gateway-host=0.0.0.0
-      - --execution-endpoint=http://geth:8551
+      - --execution-endpoint=http://logproxy:9551
       - --accept-terms-of-use
       - --jwt-secret=/execution/jwtsecret
       - --suggested-fee-recipient=0x123463a4b065722e99115d6c222f267d9cabb524
@@ -98,8 +106,8 @@ services:
     depends_on:
       geth-genesis:
         condition: service_completed_successfully
-      beacon-chain:
-        condition: service_started
+      #beacon-chain:
+      #  condition: service_started
     volumes:
       - ./execution:/execution
       - ./execution/jwtsecret:/execution/jwtsecret
@@ -113,7 +121,7 @@ services:
       - --beacon-rpc-provider=beacon-chain:4000
       - --datadir=/consensus/validatordata
       - --accept-terms-of-use
-      - --interop-num-validators=64
+      - --interop-num-validators=1
       - --interop-start-index=0
       - --chain-config-file=/consensus/config.yml
     depends_on:
