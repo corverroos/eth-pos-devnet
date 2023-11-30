@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -80,7 +81,19 @@ func runProxy(upstreamAddr string, listenAddr string) error {
 			slog.Error("Error parsing response body", "err", err, "body", string(respBody))
 		}
 
-		slog.Info("🌊 Proxied request", "id", rpcReq.ID, "method", rpcReq.Method, "params", rpcReq.Params, "response_code", wrapper.status, "response_result", rpcResp.Result, "response_error", rpcResp.Error)
+		var respErr string
+		if rpcResp.Error.Message != "" {
+			respErr = fmt.Sprintf("%#v", rpcResp.Error)
+		}
+
+		slog.Info("🌊 Proxied request",
+			"id", rpcReq.ID,
+			"method", rpcReq.Method,
+			"params", rpcReq.Params,
+			"response_code", wrapper.status,
+			"response_result", rpcResp.Result,
+			"response_error", respErr,
+		)
 	}))
 }
 
