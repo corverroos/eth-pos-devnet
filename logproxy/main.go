@@ -64,6 +64,7 @@ func runProxy(upstreamAddr string, listenAddr string) error {
 			respBody, err = gunzip(respBody)
 			if err != nil {
 				slog.Error("Error gunzipping response body", "err", err)
+
 			}
 		}
 
@@ -76,7 +77,7 @@ func runProxy(upstreamAddr string, listenAddr string) error {
 			} `json:"error"`
 		}{}
 		if err := json.Unmarshal(respBody, &rpcResp); err != nil {
-			http.Error(w, "Error parsing response body", http.StatusBadRequest)
+			slog.Error("Error parsing response body", "err", err)
 			return
 		}
 
