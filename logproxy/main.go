@@ -83,7 +83,7 @@ func runProxy(upstreamAddr string, listenAddr string) error {
 
 		var respErr string
 		if rpcResp.Error.Message != "" {
-			respErr = fmt.Sprintf("%#v", rpcResp.Error)
+			respErr = fmt.Sprint(rpcResp.Error)
 		}
 
 		slog.Info("🌊 Proxied request",
