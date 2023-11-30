@@ -77,7 +77,7 @@ func runProxy(upstreamAddr string, listenAddr string) error {
 			} `json:"error"`
 		}{}
 		if err := json.Unmarshal(respBody, &rpcResp); err != nil {
-			slog.Error("Error parsing response body", "err", err)
+			slog.Error("Error parsing response body", "err", err, "body", string(respBody))
 			return
 		}
 
